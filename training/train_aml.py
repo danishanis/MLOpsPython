@@ -13,6 +13,20 @@ import joblib
 import json
 from train import split_data, train_model, get_model_metrics
 
+def register_dataset(
+    aml_workspace: Workspace,
+    dataset_name: str,
+    datastore_name: str,
+    file_path: str
+) -> Dataset:
+    datastore = Datastore.get(aml_workspace, datastore_name)
+    dataset = Dataset.Tabular.from_delimited_files(path=(datastore, file_path))
+    dataset = dataset.register(workspace=aml_workspace,
+                               name=dataset_name,
+                               create_new_version=True)
+
+    return dataset
+
 def main():
     print("Running train_aml.py...")
 
@@ -51,17 +65,26 @@ def main():
         help=("dataset version")
     )
 
+    parser.add_argument(
+        "--data_file_path",
+        type=str,
+        help=("data file path, if specified,\
+               a new version of the dataset will be registered")
+    )
+
     args = parser.parse_args()
     
     print("Argument [model_name]: %s" % args.model_name)
     print("Argument [step_output]: %s" % args.step_output)
     print("Argument [dataset_version]: %s" % args.dataset_version)
+    print("Argument [data_file_path]: %s" % args.data_file_path)
     print("Argument [caller_run_id]: %s" % args.caller_run_id)
     print("Argument [dataset_name]: %s" % args.dataset_name)
 
     model_name = args.model_name
     step_output_path = args.step_output
     dataset_version = args.dataset_version
+    data_file_path = args.data_file_path
     dataset_name = args.dataset_name
 
     run = Run.get_context()
@@ -81,7 +104,7 @@ def main():
     print(f"Parameters: {train_args}")
     for (k, v) in train_args.items():
         run.log(k, v)
-        run.parent.log(k, v)
+        # run.parent.log(k, v)    # logging metrics to an optional parent run
 
     # Get the dataset
     dataset = Dataset.get_by_name(run.experiment.workspace, dataset_name,

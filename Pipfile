@@ -10,6 +10,7 @@ azureml = "*"
 scikit-learn = "*"
 matplotlib = "*"
 setuptools = "*"
+"azureml.core" = "*"
 
 [dev-packages]
 ipykernel = "*"
