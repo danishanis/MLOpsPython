@@ -9,8 +9,10 @@ numpy = "*"
 azureml = "*"
 scikit-learn = "*"
 matplotlib = "*"
+setuptools = "*"
 
 [dev-packages]
+ipykernel = "*"
 
 [requires]
 python_version = "3.12"
