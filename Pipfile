@@ -11,6 +11,8 @@ scikit-learn = "*"
 matplotlib = "*"
 setuptools = "*"
 "azureml.core" = "*"
+argparse = "*"
+python-dotenv = "*"
 
 [dev-packages]
 ipykernel = "*"
