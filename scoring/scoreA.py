@@ -1,3 +1,5 @@
+# Mock up file presenting new model A
+
 def init():
     global model
 
