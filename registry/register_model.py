@@ -15,6 +15,7 @@ def main():
     print("Registering model...")
 
     run = Run.get_context()
+    
     if (run.id.startswith('OfflineRun')):
         from dotenv import load_dotenv
         # For local development, set values in this section
@@ -76,8 +77,14 @@ def main():
     except KeyError:
         print("Could not load registration values from file")
         register_args = {"tags": []}
-
+    
+    # dictionary of metrics and their corresponding values from /
+    # this run 
     model_tags = {}
+
+    # taking each element from the metric list, getting its /
+    # corresponding metric value for the pipeline's parent run and /
+    # save it 
     for tag in register_args["tags"]:
         try:
             mtag = run.parent.get_metrics()[tag]
@@ -87,15 +94,21 @@ def main():
 
     # load the model
     print("Loading model from " + model_path)
+    
+    # Loading the model file from where the training code /
+    # has placed it (eg. in training script, the model file was /
+    # dumped in an output path)
     model_file = os.path.join(model_path, model_name)
     model = joblib.load(model_file)
     parent_tags = run.parent.get_tags()
+
     try:
         build_id = parent_tags["BuildId"]
     except KeyError:
         build_id = None
         print("BuildId tag not found on parent run.")
         print(f"Tags present: {parent_tags}")
+    
     try:
         build_uri = parent_tags["BuildUri"]
     except KeyError:
@@ -104,6 +117,9 @@ def main():
         print(f"Tags present: {parent_tags}")
 
     if (model is not None):
+        # If model found, we fetch the dataset id that the model was /
+        # trained on from the appearence tag and proceed to registering /
+        # the model
         dataset_id = parent_tags["dataset_id"]
         if (build_id is None):
             register_aml_model(
@@ -138,6 +154,11 @@ def main():
 
 
 def model_already_registered(model_name, exp, run_id):
+    """
+    Method checks if there is already a model with the same name, 
+    experiment name, model id, run id etc. If so, then the model is 
+    not registered and an exception is raised.
+    """
     model_list = AMLModel.list(exp.workspace, name=model_name, run_id=run_id)
     if len(model_list) >= 1:
         e = ("Model name:", model_name, "in workspace",
@@ -158,6 +179,13 @@ def register_aml_model(
     build_id: str = 'none',
     build_uri=None
 ):
+    """
+    Method updates the model tags dictionary with some more tags,
+    other than just 'mse' associated with the model being registered.
+
+    Next, it checks whether the model has been registered with the 
+    same build id or not.  
+    """
     try:
         tagsValue = {"area": "diabetes_regression",
                      "run_id": run_id,
