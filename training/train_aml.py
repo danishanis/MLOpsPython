@@ -28,6 +28,10 @@ def register_dataset(
     return dataset
 
 def main():
+    """
+    Defining arguments which we will pass in the run command while we call
+    the script from some workflow script
+    """
     print("Running train_aml.py...")
 
     parser = argparse.ArgumentParser("train")
@@ -38,7 +42,8 @@ def main():
         help="Name of the model",
         default="diabetes_model.pkl"
     )
-
+    
+    # passing data onto the next step
     parser.add_argument(
         "--step_output",
         type=str,
@@ -51,6 +56,7 @@ def main():
         help=("caller run id, for example ADF pipeline run id")
     )
 
+    # dataset name to train the model
     parser.add_argument(
         "--dataset_name",
         type=str,
@@ -59,6 +65,7 @@ def main():
               rather than the one used while the pipeline creation")
     )
 
+    # for dataset registry
     parser.add_argument(
         "--dataset_version",
         type=str,
@@ -81,17 +88,21 @@ def main():
     print("Argument [caller_run_id]: %s" % args.caller_run_id)
     print("Argument [dataset_name]: %s" % args.dataset_name)
 
+    # Assigning variables for each argument captured in the rrun command
     model_name = args.model_name
     step_output_path = args.step_output
     dataset_version = args.dataset_version
     data_file_path = args.data_file_path
     dataset_name = args.dataset_name
 
+    # Setting pipenv configurations from get context method (so the /
+    # script can run from start to finish)
     run = Run.get_context()
 
     print("Getting training parameters")
 
-    # Load the training parameters from the parameters file
+    # Load the training parameters from the parameters file instead of /
+    # hardcoding them
     with open("../utils/parameters.json") as f:
         pars = json.load(f)
     try:
@@ -100,7 +111,8 @@ def main():
         print("Could not load training values from file")
         train_args = {}
 
-    # Log the training parameters
+    # Logging the training parameters so one can check later what /
+    # parameters were used in previous runs
     print(f"Parameters: {train_args}")
     for (k, v) in train_args.items():
         run.log(k, v)
@@ -124,7 +136,8 @@ def main():
     #     print(e)
     #     raise Exception(e)
 
-    # Link dataset to the step run so it is trackable in the UI
+    # Linking dataset to the step run so it is trackable in the UI
+    # (Basically linking the pipeline run id with the dataset id)
     run.input_datasets['training_data'] = dataset
     run.parent.tag("dataset_id", value=dataset.id)
 
@@ -141,7 +154,7 @@ def main():
         run.log(k, v)
         run.parent.log(k, v)
 
-    # Pass model file to next step
+    # Pass model file to next step/an output path
     os.makedirs(step_output_path, exist_ok=True)
     model_output_path = os.path.join(step_output_path, model_name)
     joblib.dump(value=model, filename=model_output_path)

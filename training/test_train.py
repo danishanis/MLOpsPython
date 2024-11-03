@@ -2,6 +2,13 @@ import numpy as np
 from train import train_model, get_model_metrics
 
 def main():
+    """
+    Carries out unit testing for some of the methods in the train code.
+    File to include methods for training/tesitng model & model metrics.
+    The file will be a part of the CI pipeline, as soon as someone commits
+    in the 'train_aml' file, these test cases will automatically be triggered
+    in the backend
+    """
     print("Unit testing code...")
 
 def test_train_model():
