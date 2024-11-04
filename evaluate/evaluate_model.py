@@ -48,7 +48,7 @@ allow_run_cancel = args.allow_run_cancel
 # Parameterize the matrices on which the models should be compared
 # Adding golden data set on which all the model performance can be/
 # evaluated
-try:
+try: # trying to get the existing model, if any to compare with new model
     firstRegistration = False
     tag_name = 'experiment_name'
 
@@ -56,16 +56,20 @@ try:
                 model_name=model_name,
                 tag_name=tag_name,
                 tag_value=exp.name,
-                aml_workspace=ws)
+                aml_workspace=ws) # arg values must be passed in pipeline script
 
-    if (model is not None):
+    # Model comparison
+    if (model is not None): #i.e. if there is a model present
         production_model_mse = 10000
-        if (metric_eval in model.tags):
+        if (metric_eval in model.tags): # checking if the existing model has an 'mse' in its tag
+            # If there exists a tag for mse, we store value as existing model's mse value
             production_model_mse = float(model.tags[metric_eval])
+        
         try:
             new_model_mse = float(run.parent.get_metrics().get(metric_eval))
         except TypeError:
             new_model_mse = None
+        
         if (production_model_mse is None or new_model_mse is None):
             print("Unable to find ", metric_eval, " metrics, "
                   "exiting evaluation")
@@ -80,6 +84,9 @@ try:
                 )
             )
 
+        # If the new model is performing better than the existing one, /
+        # we can go ahead and register the new model, otherwise we /
+        # can cancel the pipeline and exit 
         if (new_model_mse < production_model_mse):
             print("New trained model performs better, "
                   "thus it should be registered")
@@ -91,6 +98,7 @@ try:
     else:
         print("This is the first model, "
               "thus it should be registered")
+    # (Optional) if/else condition to evaluate minimum client metrics
 
 except Exception:
     traceback.print_exc(limit=None, file=None, chain=True)
