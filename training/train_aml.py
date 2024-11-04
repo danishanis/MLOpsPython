@@ -154,7 +154,8 @@ def main():
         run.log(k, v)
         run.parent.log(k, v)
 
-    # Pass model file to next step/an output path
+    # Pass model file to next step/an output path from where the next/
+    # evaluation code will read it
     os.makedirs(step_output_path, exist_ok=True)
     model_output_path = os.path.join(step_output_path, model_name)
     joblib.dump(value=model, filename=model_output_path)
