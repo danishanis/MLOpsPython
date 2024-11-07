@@ -1,0 +1,17 @@
+# File contains the conda environment specifications for scoring metrics
+# These dependencies are used to create the environment used by the batch score 
+
+# The dependencies specified in the file will be automatically provisioned for managed runs.
+name: diabetes_regression_score_copy_env
+dependencies:
+  # The python interpreter version.
+  # Currently Azure ML Workbench only supports 3.5.2 and later.
+  - python=3.7.*
+  - pip
+
+  - pip:
+      # Base AzureML SDK
+      - azureml-sdk==1.27.*
+      
+      # Score copying deps
+      - azure-storage-blob
