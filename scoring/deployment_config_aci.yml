@@ -1,0 +1,7 @@
+# deployment configurations for serverless containers
+
+# File specifies the infrastructure to create a serverless cluster
+computeType: ACI
+containerResourceRequirements:
+  cpu: 1
+  memoryInGB: 4

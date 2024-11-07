@@ -1,0 +1,20 @@
+# deployment configurations for kubernetes cluster
+# AKS is managed container orchestration service based on open source kubernetes system
+
+# File specifies the infrastructure to create kubernetes cluster
+computeType: AKS
+autoScaler:
+    autoscaleEnabled: True
+    minReplicas: 1
+    maxReplicas: 3
+    refreshPeriodInSeconds: 10
+    targetUtilization: 70
+authEnabled: True
+containerResourceRequirements:
+    cpu: 0.5
+    memoryInGB: 2
+appInsightsEnabled: True
+scoringTimeoutMs: 5000
+maxConcurrentRequestsPerContainer: 2
+maxQueueWaitMs: 5000
+sslEnabled: True
