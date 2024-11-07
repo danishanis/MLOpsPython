@@ -1,7 +1,9 @@
 # configuration file for the containers to be launched
+
+# File specifies what to provision and install in the infrastructure
 entryScript: score.py
 runtime: python
-condaFile: ../conda_dependencies.yml
+condaFile: ../conda_dependencies.yml # pointing to the file that contains environment specifications for the containers to be launched
 extraDockerfileSteps:
 schemaFile:
 sourceDirectory:
