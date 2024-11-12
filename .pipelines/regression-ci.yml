@@ -1,4 +1,4 @@
-# Continuous Integration (CI) pipeline that orchestrates the training, evaluation, orchestration and registration of the regression model.
+# Continuous Integration (CI) pipeline that orchestrates the training, evaluation and registration of the regression model.
 
 resources:
   containers:  # Container jobs let you isolate your tools and dependencies inside a container
@@ -12,7 +12,7 @@ trigger:  # Specifies which branch will cause this CI build to run, i.e. the mai
     - main
   paths:
     include: # Using include clause within the main branch, one can specify for which individual files would they like to trigger the pipeline 
-    - MLOpsPython/
+    - MLOpsPython
     - ml_service/pipelines/regression_build_train_pipeline.py
     - ml_service/pipelines/regression_build_train_pipeline_with_r.py
     - ml_service/pipelines/regression_build_train_pipeline_with_r_on_dbricks.py
@@ -21,11 +21,11 @@ variables:  # variables directory to specify the variables group
 - template: regression-variables-template.yml
 - group: devopsforai-aml-vg
 
-pool:
+pool: # Setting the VM Image one wants to use
   vmImage: ubuntu-latest
 
-stages:
-- stage: 'Model_CI'
+stages: # Collection of related jobs that the pipeline is divided and run into
+- stage: 'Model_CI' # Stage 1 - Does all CI activites (eg. Lint Test, Unit Test, Building Azure Code, Publishing the pipeline)
   displayName: 'Model CI'
   jobs:
   - job: "Model_CI_Pipeline"
@@ -46,7 +46,7 @@ stages:
           python -m ml_service.pipelines.regression_build_train_pipeline
       displayName: 'Publish Azure Machine Learning Pipeline'
 
-- stage: 'Trigger_AML_Pipeline'
+- stage: 'Trigger_AML_Pipeline' # Stage 2 - Calls the published pipeline from stage 1, does training and model registry into workspace, provides new version of the model from updated code in stage 1
   displayName: 'Train and evaluate model'
   condition: succeeded()
   variables:
