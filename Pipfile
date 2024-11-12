@@ -13,6 +13,7 @@ setuptools = "*"
 "azureml.core" = "*"
 argparse = "*"
 python-dotenv = "*"
+"azureml.pipeline.core" = "*"
 
 [dev-packages]
 ipykernel = "*"
