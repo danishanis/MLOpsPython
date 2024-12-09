@@ -39,13 +39,14 @@ stages: # Collection of related jobs that the pipeline is divided and run into
         azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
         scriptLocation: inlineScript
         workingDirectory: $(Build.SourcesDirectory)
-        inlineScript: |
+        inlineScript: | # Step 3 - As a part of the task, the inline script is run in the azure command line using the above variable values (which file is to be run)
           set -e # fail on error
           export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
           # Invoke the Python building and publishing a training pipeline
           python -m ml_service.pipelines.regression_build_train_pipeline
       displayName: 'Publish Azure Machine Learning Pipeline'
 
+# Runs only when the previous stage 1 is a success
 - stage: 'Trigger_AML_Pipeline' # Stage 2 - Calls the published pipeline from stage 1, does training and model registry into workspace, provides new version of the model from updated code in stage 1
   displayName: 'Train and evaluate model'
   condition: succeeded()
