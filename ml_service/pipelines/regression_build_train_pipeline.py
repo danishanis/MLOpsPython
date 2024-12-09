@@ -60,8 +60,8 @@ def main():
 
     # Check to see if dataset exists
     if dataset_name not in aml_workspace.datasets:
-        # This call creates an example CSV from sklearn sample data. If you
-        # have already bootstrapped your project, you can comment this line
+        # This call creates an example CSV from sklearn sample data. If one
+        # has already bootstrapped their project, this line can be commented
         # out and use your own CSV.
         create_sample_data_csv()
 
@@ -102,6 +102,11 @@ def main():
         "pipeline_data", datastore=aml_workspace.get_default_datastore()
     )
 
+    # Creating Pipeline steps & publishing them
+    # PythonScriptStep class creates a series of python scripts which can later be 
+    # arranged into some order & finally can be run on a compute target
+
+    # Step 1 - Training Script
     train_step = PythonScriptStep(
         name="Train Model",
         script_name=e.train_script_path,
@@ -127,6 +132,7 @@ def main():
     )
     print("Step Train created")
 
+    # Step 2 - Evaluation Script
     evaluate_step = PythonScriptStep(
         name="Evaluate Model ",
         script_name=e.evaluate_script_path,
@@ -143,6 +149,7 @@ def main():
     )
     print("Step Evaluate created")
 
+    # Step 3 - Model Registry Script
     register_step = PythonScriptStep(
         name="Register Model ",
         script_name=e.register_script_path,
@@ -155,6 +162,7 @@ def main():
     )
     print("Step Register created")
     # Check run_evaluation flag to include or exclude evaluation step.
+    # Order in which the steps are run
     if (e.run_evaluation).lower() == "true":
         print("Include evaluation step before register step.")
         evaluate_step.run_after(train_step)
@@ -165,6 +173,7 @@ def main():
         register_step.run_after(train_step)
         steps = [train_step, register_step]
 
+    # Once the steps are put in order, we create a pipeline and publish it
     train_pipeline = Pipeline(workspace=aml_workspace, steps=steps)
     train_pipeline._set_experiment_name
     train_pipeline.validate()
