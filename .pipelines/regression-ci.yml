@@ -6,7 +6,7 @@ resources:
     image: mcr.microsoft.com/mlops/python:latest  # Container image name
 
 pr: none
-trigger:  # Specifies which branch will cause this CI build to run, i.e. the main branch
+trigger:  # Specifies which branch will cause this CI build to run, i.e. the main branch (along with other files)
   branches:
     include:
     - main
