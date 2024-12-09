@@ -1,4 +1,5 @@
 # Pipeline template to run & publish linting, unit tests with code coverage, and publish the results. 
+# File is responsible for testing as soon as the code is modified.
 
 steps:
   - script: |   
